@@ -12,17 +12,14 @@ import {
   Button,
   Platform,
 } from 'react-native';
-import {Linking} from 'react-native';
 
 const KhaltiEbanking = () => {
   const [bankList, setBankList] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [inputVisible, setInputVisible] = useState(false);
-  const [logo, setLogo] = useState(true);
   const [buttonLoading, setButtonLoading] = useState(false);
   const [mobileNumber, setMobileNumber] = useState('');
-  const [bankName, setBankName] = useState('');
-  const [eBankIdx, setEBankIdx] = useState(null);
+  const [bankInfo, setBankInfo] = useState({});
 
   useEffect(() => {
     fetch('https://khalti.com/api/bank/?has_ebanking=true', {
@@ -47,10 +44,15 @@ const KhaltiEbanking = () => {
       amount: amount,
       product_identity: 'book/id-120',
       product_name: 'A Song of Ice and Fire',
-      bank: eBankIdx,
-      source: 'web',
+      bank: bankInfo.idx,
+      //TODO: deep linking needed
+      return_url: 'http://example.bookshop.com/',
+      source: 'custom',
     };
-    fetch('https://khalti.com/api/payment/initiate/', {
+
+    console.log(body);
+
+    fetch('https://khalti.com/api/ebanking/initiate/', {
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -58,9 +60,18 @@ const KhaltiEbanking = () => {
       },
       body: JSON.stringify(body),
     })
-      .then(res => res.json())
-      .then(data => {
-        console.log(data);
+      .then(res => console.log('res', res))
+      // .then(data => {
+      //   console.log('data', data);
+      // })
+      .catch(error => {
+        console.log('error', error);
+        console.log(
+          'There has been a problem with your fetch operation: ' +
+            error.message,
+        );
+        // ADD THIS THROW error
+        throw error;
       });
   };
 
@@ -69,10 +80,8 @@ const KhaltiEbanking = () => {
       <View style={styles.bankContent}>
         <TouchableOpacity
           onPress={() => {
-            setEBankIdx(item.idx);
+            setBankInfo(item);
             setInputVisible(true);
-            setBankName(item.name);
-            setLogo(item.logo);
           }}
           style={styles.bankWrapper}>
           <Image source={{uri: `${item.logo}`}} style={styles.bankLogo} />
@@ -111,7 +120,7 @@ const KhaltiEbanking = () => {
 
       {inputVisible && (
         <View style={styles.inputContainer}>
-          <Image source={{uri: `${logo}`}} style={styles.bankLogo} />
+          <Image source={{uri: `${bankInfo.logo}`}} style={styles.bankLogo} />
 
           <TextInput
             placeholder="Mobile Number"

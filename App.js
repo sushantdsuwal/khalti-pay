@@ -41,7 +41,7 @@ const Khalti = () => {
         <View style={styles.tabBarContainer}>
           {TAB.map((item, i) => _renderTab(item, i))}
         </View>
-        <View style={{height: height / 3}}>
+        <View style={{height: height / 2.7}}>
           {activeTab === 'E-Banking' ? <KhaltiEbanking /> : <KhaltiWallet />}
         </View>
       </View>
